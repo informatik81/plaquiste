@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>PlaquistePro ERP — Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --font: 'Plus Jakarta Sans', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --r: 14px; --r-sm: 8px; --r-lg: 20px; --r-xl: 28px;
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+[data-theme="dark"] {
+  --bg:#080c14; --bg2:#0d1220; --surf:#111827; --surf2:#1a2235; --surf3:#202c42;
+  --border:#1e2d47; --border2:#2a3d5c;
+  --text:#f0f4ff; --text2:#8899bb; --text3:#3d5070;
+  --accent:#3b82f6; --accent2:#1d4ed8; --accentG:#06b6d4;
+  --amber:#f59e0b; --green:#10b981; --red:#ef4444; --purple:#8b5cf6;
+  --glow:rgba(59,130,246,.12);
+}
+[data-theme="light"] {
+  --bg:#f0f4ff; --bg2:#e8edf8; --surf:#ffffff; --surf2:#f8faff; --surf3:#eef2fc;
+  --border:#dde3f0; --border2:#c8d0e8;
+  --text:#0f172a; --text2:#4a5982; --text3:#94a3b8;
+  --accent:#2563eb; --accent2:#1d4ed8; --accentG:#0891b2;
+  --amber:#d97706; --green:#059669; --red:#dc2626; --purple:#7c3aed;
+  --glow:rgba(37,99,235,.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{height:100%;-webkit-text-size-adjust:100%;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s;user-select:none;overflow:hidden;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* ── LAYOUT ── */
+.app{display:flex;height:100vh;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:230px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:transform .3s var(--ease);z-index:100;}
+@media(max-width:800px){.sidebar{position:fixed;inset:0;width:250px;transform:translateX(-100%);}.sidebar.open{transform:none;}.overlay{display:block!important;}}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;backdrop-filter:blur(2px);}
+
+.sidebar-logo{padding:20px 16px;display:flex;align-items:center;gap:11px;border-bottom:1px solid var(--border);}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;box-shadow:0 4px 14px rgba(59,130,246,.35);}
+.logo-text{font-size:15px;font-weight:800;letter-spacing:-.4px;}
+.logo-sub{font-size:9px;color:var(--text2);font-family:var(--mono);letter-spacing:.8px;margin-top:1px;}
+
+.sidebar-nav{flex:1;padding:10px 8px;overflow-y:auto;}
+.nav-group-label{font-size:9px;font-weight:700;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;padding:12px 10px 5px;font-family:var(--mono);}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;transition:all .15s;margin-bottom:1px;position:relative;}
+.nav-item:hover{background:var(--surf2);color:var(--text);}
+.nav-item.active{background:linear-gradient(135deg,rgba(59,130,246,.18),rgba(59,130,246,.07));color:var(--accent);border:1px solid rgba(59,130,246,.18);}
+.nav-icon{font-size:16px;flex-shrink:0;width:20px;text-align:center;}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:700;font-family:var(--mono);min-width:17px;height:17px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+
+.sidebar-foot{padding:10px 8px 14px;border-top:1px solid var(--border);}
+.user-card{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;cursor:pointer;background:var(--surf2);border:1px solid var(--border);transition:border-color .15s;}
+.user-card:hover{border-color:var(--accent);}
+.avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:#fff;}
+.av-admin{background:linear-gradient(135deg,var(--accent),var(--purple));}
+.av-driver{background:linear-gradient(135deg,var(--green),var(--accentG));}
+.av-client{background:linear-gradient(135deg,var(--amber),var(--red));}
+.user-name{font-size:12px;font-weight:600;}
+.user-role{font-size:9px;color:var(--text2);font-family:var(--mono);}
+
+/* ── TOPBAR ── */
+.topbar-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.topbar{height:56px;flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:10px;z-index:50;}
+.topbar-title{font-size:17px;font-weight:700;}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:7px;}
+.icon-btn{width:34px;height:34px;border-radius:9px;background:var(--surf2);border:1px solid var(--border);color:var(--text2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;position:relative;flex-shrink:0;}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent);}
+.notif-dot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--red);border:1.5px solid var(--bg2);}
+
+.role-switcher{display:flex;gap:3px;background:var(--surf2);border:1px solid var(--border);border-radius:9px;padding:3px;}
+.rs-btn{padding:4px 11px;border-radius:7px;border:none;cursor:pointer;font-family:var(--font);font-size:11px;font-weight:600;background:none;color:var(--text2);transition:all .15s;}
+.rs-btn.active{background:var(--surf);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.15);}
+
+/* ── PAGES ── */
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.page{display:none;padding:20px;animation:pgIn .2s var(--ease);}
+.page.active{display:block;}
+@keyframes pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── CARDS ── */
+.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;transition:all .2s;}
+.card-title{font-size:11px;font-weight:700;color:var(--text2);font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+@media(max-width:1000px){.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+.kpi{background:var(--surf);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px 16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;transition:height .2s;}
+.kpi:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.15);}
+.kpi:hover::after{height:5px;}
+.kpi.blue::after{background:var(--accent);}
+.kpi.green::after{background:var(--green);}
+.kpi.amber::after{background:var(--amber);}
+.kpi.red::after{background:var(--red);}
+.kpi.purple::after{background:var(--purple);}
+.kpi-ico{font-size:24px;margin-bottom:8px;}
+.kpi-val{font-size:34px;font-weight:800;letter-spacing:-1.5px;line-height:1;margin-bottom:3px;}
+.kpi-lbl{font-size:11px;color:var(--text2);}
+.kpi-sub{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:4px;}
+.kpi-trend{position:absolute;top:14px;right:14px;font-size:10px;font-weight:700;font-family:var(--mono);padding:2px 7px;border-radius:5px;}
+.t-up{background:rgba(16,185,129,.12);color:var(--green);}
+.t-dn{background:rgba(239,68,68,.1);color:var(--red);}
+
+/* ── GRID ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:2fr 1fr;gap:14px;}
+@media(max-width:860px){.g2,.g3{grid-template-columns:1fr;}}
+
+/* ── CHIPS ── */
+.chip{font-size:10px;font-family:var(--mono);font-weight:500;padding:3px 8px;border-radius:20px;}
+.c-wait{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+.c-tran{background:rgba(59,130,246,.12);color:var(--accent);border:1px solid rgba(59,130,246,.2);}
+.c-done{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.2);}
+.c-inc{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.c-gray{background:var(--surf2);color:var(--text2);border:1px solid var(--border);}
+.c-urg{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+
+/* ── BUTTONS ── */
+.btn{padding:9px 16px;border-radius:10px;border:none;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap;}
+.btn:active{transform:scale(.97);}
+.btn-p{background:var(--accent);color:#fff;box-shadow:0 2px 10px rgba(59,130,246,.3);}
+.btn-p:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 4px 18px rgba(59,130,246,.4);}
+.btn-g{background:var(--surf2);color:var(--text);border:1px solid var(--border);}
+.btn-g:hover{border-color:var(--accent);color:var(--accent);}
+.btn-d{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.btn-d:hover{background:var(--red);color:#fff;}
+.btn-ok{background:var(--green);color:#fff;box-shadow:0 2px 10px rgba(16,185,129,.25);}
+.btn-sm{padding:6px 11px;font-size:11px;border-radius:8px;}
+
+/* ── DELIVERY LIST ── */
+.dl-list{display:flex;flex-direction:column;gap:8px;}
+.dl-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:grid;grid-template-columns:4px 1fr auto;gap:12px;align-items:center;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;}
+.dl-card::after{content:'';position:absolute;inset:0;background:var(--glow);opacity:0;transition:opacity .2s;}
+.dl-card:hover{border-color:var(--accent);transform:translateX(3px);}
+.dl-card:hover::after{opacity:1;}
+.dl-bar{border-radius:2px;align-self:stretch;}
+.b-wait{background:var(--amber);}
+.b-tran{background:var(--accent);}
+.b-done{background:var(--green);}
+.b-inc{background:var(--red);}
+.dl-client{font-size:15px;font-weight:700;letter-spacing:-.2px;margin-bottom:2px;}
+.dl-addr{font-size:12px;color:var(--text2);}
+.dl-meta{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap;}
+.dl-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+.dl-time{font-size:10px;font-family:var(--mono);color:var(--text3);}
+
+/* ── STOCK BARS ── */
+.stock-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.stock-item:last-child{border-bottom:none;}
+.s-name{font-size:13px;font-weight:600;flex:1;min-width:0;}
+.s-ref{font-size:10px;color:var(--text2);font-family:var(--mono);}
+.prog-wrap{flex:1;height:5px;background:var(--surf3);border-radius:3px;overflow:hidden;}
+.prog-bar{height:100%;border-radius:3px;transition:width .5s var(--ease);}
+.p-ok{background:var(--green);}
+.p-low{background:var(--amber);}
+.p-crit{background:var(--red);}
+.s-qty{font-size:12px;font-weight:700;font-family:var(--mono);min-width:54px;text-align:right;}
+
+/* ── CHART ── */
+.chart-wrap{height:140px;display:flex;align-items:flex-end;gap:6px;padding:4px 0;}
+.c-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end;}
+.c-bar{width:100%;border-radius:4px 4px 0 0;min-height:3px;transition:height .5s var(--ease);position:relative;cursor:pointer;}
+.c-bar.accent{background:linear-gradient(180deg,var(--accent),rgba(59,130,246,.35));}
+.c-bar.green{background:linear-gradient(180deg,var(--green),rgba(16,185,129,.3));}
+.c-bar.amber{background:linear-gradient(180deg,var(--amber),rgba(245,158,11,.3));}
+.c-bar:hover::after{content:attr(data-v);position:absolute;top:-22px;left:50%;transform:translateX(-50%);background:var(--surf3);color:var(--text);font-size:9px;font-family:var(--mono);padding:2px 6px;border-radius:4px;white-space:nowrap;pointer-events:none;}
+.c-lbl{font-size:9px;color:var(--text3);font-family:var(--mono);}
+.c-val{font-size:9px;font-weight:700;font-family:var(--mono);color:var(--text2);}
+
+/* ── DONUT ── */
+.donut-wrap{display:flex;align-items:center;gap:16px;}
+.donut{position:relative;width:90px;height:90px;flex-shrink:0;}
+.donut svg{transform:rotate(-90deg);}
+.donut-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.donut-pct{font-size:18px;font-weight:800;}
+.donut-sub{font-size:8px;color:var(--text2);font-family:var(--mono);}
+.legend{flex:1;display:flex;flex-direction:column;gap:5px;}
+.legend-row{display:flex;align-items:center;gap:7px;font-size:11px;}
+.leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+/* ── TIMELINE ── */
+.tl{position:relative;padding-left:22px;}
+.tl::before{content:'';position:absolute;left:7px;top:5px;bottom:5px;width:2px;background:var(--border);border-radius:1px;}
+.tl-item{position:relative;padding-bottom:18px;}
+.tl-item:last-child{padding-bottom:0;}
+.tl-dot{position:absolute;left:-19px;top:3px;width:13px;height:13px;border-radius:50%;border:2px solid var(--bg2);}
+.td-done{background:var(--green);}
+.td-tran{background:var(--accent);animation:pulseD 1.5s infinite;}
+.td-wait{background:var(--amber);}
+.td-inc{background:var(--red);}
+@keyframes pulseD{0%,100%{box-shadow:0 0 6px rgba(59,130,246,.4)}50%{box-shadow:0 0 14px rgba(59,130,246,.8)}}
+.tl-t{font-size:10px;color:var(--text3);font-family:var(--mono);}
+.tl-h{font-size:13px;font-weight:600;margin:2px 0;}
+.tl-s{font-size:11px;color:var(--text2);}
+
+/* ── FORMS ── */
+.fg{margin-bottom:12px;}
+.fg label{display:block;font-size:10px;font-weight:700;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;font-family:var(--mono);}
+.fg input,.fg select,.fg textarea{width:100%;padding:11px 13px;background:var(--surf2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:all .15s;-webkit-appearance:none;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow);}
+.fg textarea{resize:vertical;min-height:70px;font-size:13px;}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:600px){.fgrid{grid-template-columns:1fr;}}
+
+/* ── MODAL ── */
+.modal-ov{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.72);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:16px;}
+.modal-ov.open{display:flex;animation:fadeIn .2s;}
+.modal{background:var(--surf);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.45);animation:modalIn .22s var(--ease);}
+@keyframes modalIn{from{opacity:0;transform:scale(.95)translateY(10px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-title{font-size:19px;font-weight:700;margin-bottom:18px;letter-spacing:-.3px;}
+.modal-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--border);}
+
+/* ── SIGNATURE ── */
+#sig-canvas{width:100%;height:160px;background:#fff;border-radius:10px;border:2px solid var(--border);cursor:crosshair;touch-action:none;display:block;}
+
+/* ── DRIVER CARD ── */
+.drv-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:12px;}
+.drv-hdr{padding:14px 16px;display:flex;align-items:flex-start;gap:10px;border-bottom:1px solid var(--border);}
+.drv-num{width:34px;height:34px;border-radius:9px;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;}
+.drv-main{flex:1;min-width:0;}
+.drv-client{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.drv-addr{font-size:12px;color:var(--text2);margin-top:2px;}
+.drv-meta{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap;}
+.drv-mats{padding:12px 16px;}
+.mat-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.mat-row:last-child{border-bottom:none;}
+.mat-qty{font-family:var(--mono);background:var(--surf2);padding:2px 9px;border-radius:6px;font-size:11px;}
+.drv-foot{padding:10px 16px;border-top:1px solid var(--border);display:flex;gap:7px;flex-wrap:wrap;}
+
+/* ── INCIDENT CARD ── */
+.inc-card{background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.14);border-radius:var(--r);padding:13px;margin-bottom:8px;}
+.inc-type{font-size:10px;font-weight:700;color:var(--red);font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;}
+
+/* ── CLIENT TRACKING ── */
+.track-steps{display:flex;align-items:center;margin:18px 0;}
+.trk-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;}
+.trk-step::before{content:'';position:absolute;top:15px;left:-50%;right:50%;height:2px;background:var(--border);}
+.trk-step:first-child::before{display:none;}
+.trk-step.done::before{background:var(--green);}
+.trk-step.curr::before{background:linear-gradient(90deg,var(--green),var(--accent));}
+.trk-icon{width:30px;height:30px;border-radius:50%;z-index:1;display:flex;align-items:center;justify-content:center;font-size:13px;background:var(--surf3);border:2px solid var(--border);transition:all .3s;}
+.trk-step.done .trk-icon{background:var(--green);border-color:var(--green);color:#fff;}
+.trk-step.curr .trk-icon{background:var(--accent);border-color:var(--accent);color:#fff;animation:pulseD 1.5s infinite;}
+.trk-lbl{font-size:9px;color:var(--text2);font-family:var(--mono);letter-spacing:.4px;text-align:center;}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead tr{border-bottom:2px solid var(--border);}
+th{padding:9px 11px;text-align:left;font-size:9px;font-weight:700;color:var(--text2);font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase;}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s;cursor:pointer;}
+tbody tr:hover{background:var(--surf2);}
+td{padding:11px 11px;vertical-align:middle;}
+
+/* ── NOTIF PANEL ── */
+.notif-panel{position:absolute;top:46px;right:0;z-index:200;width:300px;background:var(--surf);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:0 14px 48px rgba(0,0,0,.3);display:none;}
+.notif-panel.open{display:block;animation:slideD .18s var(--ease);}
+@keyframes slideD{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.np-hdr{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.np-item{padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;}
+.np-item:hover{background:var(--surf2);}
+.np-item:last-child{border-bottom:none;}
+.np-title{font-size:12px;font-weight:600;margin-bottom:2px;}
+.np-body{font-size:11px;color:var(--text2);}
+.np-time{font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px;}
+.np-unread{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+
+/* ── STATUS BADGE ── */
+.sb{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;font-family:var(--mono);}
+.sb-wait{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+.sb-tran{background:rgba(59,130,246,.12);color:var(--accent);border:1px solid rgba(59,130,246,.2);}
+.sb-done{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.2);}
+.sb-inc{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.sb-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.sb-dot.anim{animation:pulseD 1.5s infinite;}
+
+/* ── TOAST ── */
+.toast-area{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;gap:7px;align-items:center;pointer-events:none;}
+.toast{background:var(--surf);border:1px solid var(--border2);color:var(--text);padding:11px 18px;border-radius:50px;font-size:13px;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.3);animation:toastIn .22s var(--ease),toastOut .28s var(--ease) 2.4s forwards;white-space:nowrap;}
+.toast.ok{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3);color:#6ee7b7;}
+.toast.err{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.25);color:#fca5a5;}
+.toast.info{background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.25);color:#93c5fd;}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateY(8px)}}
+
+/* ── MAT LINE ── */
+.mat-line-wrap{display:flex;gap:7px;margin-bottom:7px;align-items:center;}
+.mat-line-wrap input{background:var(--surf2);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:var(--font);font-size:13px;padding:9px 11px;outline:none;transition:border-color .15s;}
+.mat-line-wrap input:focus{border-color:var(--accent);}
+.mat-name-inp{flex:2;}
+.mat-qty-inp{width:70px;text-align:center;}
+.mat-unit-inp{width:80px;}
+.btn-rm-line{width:30px;height:30px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:7px;color:var(--red);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.btn-rm-line:hover{background:var(--red);color:#fff;}
+
+/* ── MISC ── */
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap;}
+.section-title{font-size:22px;font-weight:800;letter-spacing:-.4px;}
+.search-inp{padding:10px 13px;background:var(--surf);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:border-color .15s;min-width:200px;flex:1;}
+.search-inp:focus{border-color:var(--accent);}
+.filters{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;overflow-x:auto;}
+.filter-btn{padding:7px 13px;border-radius:20px;border:1.5px solid var(--border);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:var(--surf);color:var(--text2);font-family:var(--font);min-height:34px;display:flex;align-items:center;transition:all .15s;}
+.filter-btn:hover{border-color:var(--accent);color:var(--accent);}
+.filter-btn.active-f{background:var(--accent);color:#fff;border-color:var(--accent);}
+.empty-state{text-align:center;padding:40px;color:var(--text2);}
+.empty-ico{font-size:44px;opacity:.18;margin-bottom:10px;}
+.empty-ttl{font-size:16px;font-weight:700;color:var(--text);}
+</style>
+</head>
+<body>
+
+<!-- OVERLAY (mobile) -->
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="app">
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🏗️</div>
+    <div>
+      <div class="logo-text">PlaquistePro</div>
+      <div class="logo-sub">ERP v2.0</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav" id="sidebar-nav"></nav>
+  <div class="sidebar-foot">
+    <div class="user-card" onclick="openModal('modal-profile')">
+      <div class="avatar av-admin" id="sb-avatar">AD</div>
+      <div>
+        <div class="user-name" id="sb-name">Administrateur</div>
+        <div class="user-role" id="sb-role">admin · en ligne</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ CONTENT ═══ -->
+<div class="topbar-area">
+  <div class="topbar">
+    <button class="icon-btn" onclick="toggleSidebar()">☰</button>
+    <div class="topbar-title" id="topbar-title">Dashboard</div>
+    <div class="topbar-right">
+      <div class="role-switcher">
+        <button class="rs-btn active" onclick="switchRole('admin',this)">Admin</button>
+        <button class="rs-btn"        onclick="switchRole('driver',this)">Chauffeur</button>
+        <button class="rs-btn"        onclick="switchRole('client',this)">Client</button>
+      </div>
+      <button class="icon-btn" onclick="toggleTheme()" title="Thème">🌙</button>
+      <div style="position:relative">
+        <button class="icon-btn" onclick="toggleNotifs()" id="notif-btn">
+          🔔<div class="notif-dot" id="notif-indicator"></div>
+        </button>
+        <div class="notif-panel" id="notif-panel">
+          <div class="np-hdr">
+            <span style="font-weight:700;font-size:13px">Notifications</span>
+            <button class="btn btn-g btn-sm" onclick="markAllRead()">Tout lire</button>
+          </div>
+          <div id="notif-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="kpi-grid" id="kpi-grid"></div>
+      <div class="g3">
+        <div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="card-title">📦 Livraisons — 7 jours</div>
+            <div class="chart-wrap" id="chart-7d"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">🕐 Timeline aujourd'hui</div>
+            <div class="tl" id="timeline"></div>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="card-title">📊 Statuts</div>
+            <div class="donut-wrap" id="donut"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">⚠️ Stock faible</div>
+            <div id="dash-stock-alerts"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVRAISONS -->
+    <div id="page-livraisons" class="page">
+      <div class="section-head">
+        <input class="search-inp" type="search" placeholder="🔍 Client, adresse, référence..." oninput="filterDel(this.value)" id="del-search">
+        <button class="btn btn-p" onclick="openModal('modal-new-del')">＋ Nouvelle livraison</button>
+      </div>
+      <div class="filters" id="del-filters">
+        <button class="filter-btn active-f" onclick="setFilter('all',this)">Toutes</button>
+        <button class="filter-btn" onclick="setFilter('pending',this)">⏳ Attente</button>
+        <button class="filter-btn" onclick="setFilter('in_transit',this)">🚛 Transit</button>
+        <button class="filter-btn" onclick="setFilter('delivered',this)">✅ Livrés</button>
+        <button class="filter-btn" onclick="setFilter('incident',this)">⚠️ Incidents</button>
+      </div>
+      <div class="dl-list" id="del-list"></div>
+    </div>
+
+    <!-- STOCK -->
+    <div id="page-stock" class="page">
+      <div class="section-head">
+        <span class="section-title">Stock</span>
+        <button class="btn btn-p btn-sm" onclick="toast('Ajout produit','info')">＋ Ajouter</button>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-title">📦 Catalogue produits</div>
+          <div id="stock-full"></div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="card-title">🔴 Alertes seuil</div>
+            <div id="stock-alerts-pg"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">📊 Par catégorie</div>
+            <div class="chart-wrap" style="height:110px" id="chart-cats"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div id="page-clients" class="page">
+      <div class="section-head">
+        <span class="section-title">Clients</span>
+        <button class="btn btn-p btn-sm" onclick="openModal('modal-new-client')">＋ Nouveau client</button>
+      </div>
+      <div class="card">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Entreprise</th><th>Contact</th><th>Téléphone</th><th>Livraisons</th><th>Statut</th><th>Actions</th></tr></thead>
+            <tbody id="clients-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- INCIDENTS -->
+    <div id="page-incidents" class="page">
+      <div class="section-head"><span class="section-title">Incidents</span></div>
+      <div id="incidents-list"></div>
+    </div>
+
+    <!-- STATS -->
+    <div id="page-stats" class="page">
+      <div class="section-head"><span class="section-title">Statistiques</span></div>
+      <div class="kpi-grid">
+        <div class="kpi blue"><div class="kpi-ico">📦</div><div class="kpi-val">142</div><div class="kpi-lbl">Livraisons / mois</div><div class="kpi-trend t-up">+18%</div></div>
+        <div class="kpi green"><div class="kpi-ico">✅</div><div class="kpi-val">94%</div><div class="kpi-lbl">Taux succès</div><div class="kpi-trend t-up">+2pts</div></div>
+        <div class="kpi amber"><div class="kpi-ico">⚡</div><div class="kpi-val">2.4h</div><div class="kpi-lbl">Délai moyen</div><div class="kpi-trend t-dn">+12min</div></div>
+        <div class="kpi purple"><div class="kpi-ico">💶</div><div class="kpi-val">48k€</div><div class="kpi-lbl">CA facturé</div><div class="kpi-trend t-up">+23%</div></div>
+      </div>
+      <div class="g2" style="margin-top:12px">
+        <div class="card">
+          <div class="card-title">📈 Livraisons / mois</div>
+          <div class="chart-wrap" id="chart-monthly"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">🏆 Top chauffeurs</div>
+          <div id="top-drivers"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAUFFEUR -->
+    <div id="page-driver" class="page">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+        <div class="sb sb-tran"><span class="sb-dot anim"></span>En service</div>
+        <span style="font-size:19px;font-weight:700">Mes livraisons du jour</span>
+      </div>
+      <div id="driver-list"></div>
+    </div>
+
+    <!-- CLIENT TRACKING -->
+    <div id="page-client-track" class="page">
+      <div style="font-size:19px;font-weight:700;margin-bottom:16px">Suivi de mes livraisons</div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title">📍 REF-2024-0041 — En transit</div>
+        <div class="track-steps" id="track-steps">
+          <div class="trk-step done"><div class="trk-icon">📋</div><div class="trk-lbl">CONFIRMÉ</div></div>
+          <div class="trk-step done"><div class="trk-icon">🏭</div><div class="trk-lbl">PRÉPARÉ</div></div>
+          <div class="trk-step curr"><div class="trk-icon">🚛</div><div class="trk-lbl">EN ROUTE</div></div>
+          <div class="trk-step"><div class="trk-icon">✅</div><div class="trk-lbl">LIVRÉ</div></div>
+        </div>
+        <div style="background:var(--surf2);border-radius:10px;padding:12px;margin-top:12px">
+          <div style="font-size:11px;color:var(--text2);font-family:var(--mono)">CHAUFFEUR</div>
+          <div style="font-size:14px;font-weight:700;margin-top:4px">Jean-Pierre Martin · PL-3847-AL</div>
+          <div style="font-size:12px;color:var(--green);margin-top:3px">ETA estimé : 14h30 (~25 min)</div>
+        </div>
+      </div>
+      <div id="client-del-list"></div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /topbar-area -->
+</div><!-- /app -->
+
+<!-- ═══ MODALS ═══ -->
+<!-- New Delivery -->
+<div class="modal-ov" id="modal-new-del">
+  <div class="modal">
+    <div class="modal-title">📦 Nouvelle livraison</div>
+    <div class="fgrid">
+      <div class="fg"><label>Client *</label>
+        <select><option>SARL Dupont Bâtiment</option><option>SAS Martin Construction</option><option>Entreprise Leblanc</option></select>
+      </div>
+      <div class="fg"><label>Priorité</label>
+        <select><option value="normal">Normale</option><option value="urgent">🔴 Urgente</option><option value="low">Faible</option></select>
+      </div>
+    </div>
+    <div class="fg"><label>Adresse *</label><input type="text" placeholder="15 Rue des Artisans, 69003 Lyon"></div>
+    <div class="fgrid">
+      <div class="fg"><label>Chauffeur</label>
+        <select><option>Jean-Pierre Martin</option><option>Mohamed Alaoui</option><option>Thomas Bernard</option></select>
+      </div>
+      <div class="fg"><label>Date / Heure</label><input type="datetime-local" id="f-date"></div>
+    </div>
+    <div class="fg">
+      <label>Matériaux</label>
+      <div id="f-mat-lines"></div>
+      <button class="btn btn-g btn-sm" style="margin-top:4px" onclick="addMatLine()">＋ Ligne</button>
+    </div>
+    <div class="fg"><label>Notes</label><textarea placeholder="Code portail, instructions d'accès..."></textarea></div>
+    <div class="modal-foot">
+      <button class="btn btn-g" onclick="closeModal('modal-new-del')">Annuler</button>
+      <button class="btn btn-p" onclick="createDelivery()">✓ Créer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delivery Detail -->
+<div class="modal-ov" id="modal-del-detail">
+  <div class="modal" style="max-width:620px">
+    <div id="detail-content"></div>
+    <div class="modal-foot">
+      <button class="btn btn-g" onclick="closeModal('modal-del-detail')">Fermer</button>
+      <button class="btn btn-g" onclick="genPDF()">📄 Export PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- Signature -->
+<div class="modal-ov" id="modal-sig">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-title">✍️ Signature de livraison</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Le destinataire signe pour confirmer la réception.</p>
+    <canvas id="sig-canvas"></canvas>
+    <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+      <button class="btn btn-g btn-sm" onclick="clearSig()">Effacer</button>
+      <span style="font-size:11px;color:var(--text2);font-family:var(--mono)">Tracez avec la souris ou le doigt</span>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-g" onclick="closeModal('modal-sig')">Annuler</button>
+      <button class="btn btn-ok" onclick="confirmDelivery()">✅ Confirmer livraison</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Client -->
+<div class="modal-ov" id="modal-new-client">
+  <div class="modal">
+    <div class="modal-title">👥 Nouveau client</div>
+    <div class="fgrid">
+      <div class="fg"><label>Raison sociale *</label><input type="text" placeholder="SARL Dupont Bâtiment"></div>
+      <div class="fg"><label>Contact</label><input type="text" placeholder="Pierre Dupont"></div>
+      <div class="fg"><label>Email</label><input type="email" placeholder="contact@dupont.fr"></div>
+      <div class="fg"><label>Téléphone</label><input type="tel" placeholder="04 72 00 00 00"></div>
+    </div>
+    <div class="fg"><label>Adresse</label><input type="text" placeholder="12 Rue des Chantiers, Lyon"></div>
+    <div class="fg"><label>SIRET</label><input type="text" placeholder="123 456 789 00012"></div>
+    <div class="modal-foot">
+      <button class="btn btn-g" onclick="closeModal('modal-new-client')">Annuler</button>
+      <button class="btn btn-p" onclick="createClient()">✓ Créer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Profile -->
+<div class="modal-ov" id="modal-profile">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-title">Mon profil</div>
+    <div style="text-align:center;padding:16px 0">
+      <div class="avatar" id="prf-avatar" style="width:58px;height:58px;font-size:22px;margin:0 auto 10px">AD</div>
+      <div style="font-size:18px;font-weight:700" id="prf-name">Administrateur</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:3px" id="prf-email">admin@plaquistepro.fr</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-g" onclick="closeModal('modal-profile')">Fermer</button>
+      <button class="btn btn-d btn-sm" onclick="toast('Déconnecté','ok');closeModal('modal-profile')">↩ Déconnexion</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-area" id="toast-area"></div>
+
+<script>
+// ════════════════════════════════════
+// DATA
+// ════════════════════════════════════
+const DELIVERIES = [
+  {id:'D001',ref:'REF-2024-0041',client:'SARL Dupont Bâtiment',addr:'15 Rue des Artisans, 69003 Lyon',driver:'Jean-Pierre Martin',status:'in_transit',priority:'urgent',date:'2024-12-18T09:30',lat:45.75,lon:4.83,
+   items:[{n:'Plaque BA13 standard',q:80,u:'plaques'},{n:'Rail 70mm',q:120,u:'barres'},{n:'Montant 70mm',q:90,u:'barres'}],notes:'Code portail: 1234A'},
+  {id:'D002',ref:'REF-2024-0042',client:'SAS Martin Construction',addr:'8 Avenue Félix Faure, 69007 Lyon',driver:'Mohamed Alaoui',status:'pending',priority:'normal',date:'2024-12-18T11:00',lat:45.74,lon:4.82,
+   items:[{n:'Laine de roche 100mm',q:40,u:'panneaux'},{n:'Vis TF 25mm',q:5,u:'boîtes'}],notes:''},
+  {id:'D003',ref:'REF-2024-0040',client:'Entreprise Leblanc',addr:'22 Cours Lafayette, 69006 Lyon',driver:'Thomas Bernard',status:'delivered',priority:'normal',date:'2024-12-17T14:00',lat:45.76,lon:4.84,
+   items:[{n:'Enduit Knauf',q:20,u:'sacs'},{n:'Bande armée',q:8,u:'rouleaux'}],notes:'Livré sans incident',sig:true},
+  {id:'D004',ref:'REF-2024-0039',client:'BTP Renaud',addr:'5 Rue Garibaldi, 69003 Lyon',driver:'Jean-Pierre Martin',status:'incident',priority:'urgent',date:'2024-12-17T10:00',lat:45.75,lon:4.85,
+   items:[{n:'Plaque Fermacell 12.5mm',q:30,u:'plaques'}],notes:'Adresse introuvable',incident:'Client absent, accès impossible'},
+  {id:'D005',ref:'REF-2024-0043',client:'SARL Dupont Bâtiment',addr:'42 Rue Victor Hugo, 69002 Lyon',driver:'Mohamed Alaoui',status:'pending',priority:'low',date:'2024-12-19T08:00',lat:45.75,lon:4.83,
+   items:[{n:'Suspente réglable',q:200,u:'pièces'},{n:'Fourrure 60/27',q:60,u:'barres'}],notes:''},
+];
+const STOCK = [
+  {id:'S1',n:'Plaque BA13 standard',ref:'PL-BA13',cat:'Plaques',u:'plaques',qty:450,min:100,price:8.50},
+  {id:'S2',n:'Rail 48mm',ref:'OS-R48',cat:'Ossature',u:'barres',qty:85,min:100,price:2.30},
+  {id:'S3',n:'Rail 70mm',ref:'OS-R70',cat:'Ossature',u:'barres',qty:210,min:80,price:2.80},
+  {id:'S4',n:'Laine de roche 100mm',ref:'IS-LR100',cat:'Isolation',u:'panneaux',qty:32,min:50,price:14.00},
+  {id:'S5',n:'Enduit Knauf',ref:'EN-KN25',cat:'Enduits',u:'sacs',qty:140,min:40,price:11.50},
+  {id:'S6',n:'Vis TF 25mm',ref:'VI-TF25',cat:'Visserie',u:'boîtes',qty:18,min:20,price:6.80},
+  {id:'S7',n:'Plaque Fermacell 12.5mm',ref:'PL-FC125',cat:'Plaques',u:'plaques',qty:78,min:60,price:22.00},
+  {id:'S8',n:'Bande armée 50mm',ref:'EN-BA50',cat:'Enduits',u:'rouleaux',qty:95,min:30,price:4.20},
+];
+const CLIENTS = [
+  {id:'C1',co:'SARL Dupont Bâtiment',ct:'Pierre Dupont',ph:'04 72 11 22 33',ord:24,active:true},
+  {id:'C2',co:'SAS Martin Construction',ct:'Marie Martin',ph:'04 78 33 44 55',ord:18,active:true},
+  {id:'C3',co:'Entreprise Leblanc',ct:'Paul Leblanc',ph:'06 44 55 66 77',ord:11,active:true},
+  {id:'C4',co:'BTP Renaud',ct:'Marc Renaud',ph:'04 72 88 99 00',ord:7,active:false},
+];
+const INCIDENTS = [
+  {id:'I1',ref:'REF-2024-0039',drv:'Jean-Pierre Martin',type:'wrong_address',desc:'Adresse introuvable, client absent.',status:'open',date:'2024-12-17T11:30'},
+  {id:'I2',ref:'REF-2024-0035',drv:'Mohamed Alaoui',type:'damage',desc:'2 plaques BA13 endommagées pendant le transport.',status:'in_review',date:'2024-12-16T14:20'},
+  {id:'I3',ref:'REF-2024-0030',drv:'Thomas Bernard',type:'missing',desc:'5 barres de rail 70mm manquantes à la livraison.',status:'resolved',date:'2024-12-14T09:00'},
+];
+const NOTIFS = [
+  {id:'N1',title:'🚛 Nouvelle livraison',body:'REF-2024-0043 assignée à Mohamed Alaoui',time:'il y a 5 min',read:false},
+  {id:'N2',title:'⚠️ Stock faible',body:'Rail 48mm sous le seuil (85/100 barres)',time:'il y a 1h',read:false},
+  {id:'N3',title:'🚨 Incident signalé',body:'REF-2024-0039 · Adresse introuvable',time:'il y a 3h',read:true},
+  {id:'N4',title:'✅ Livraison confirmée',body:'REF-2024-0040 livrée avec signature',time:'hier',read:true},
+];
+
+// ════════════════════════════════════
+// STATE
+// ════════════════════════════════════
+let role='admin', curPage='dashboard', delFilter='all', delSearch='';
+let pendingDelId=null, sigCtx=null, sigCanvas=null, sigDrawing=false;
+let notifOpen=false, matLineCount=0;
+
+const NAV = {
+  admin:[
+    {id:'dashboard',ico:'🏠',lbl:'Dashboard'},
+    {id:'livraisons',ico:'📦',lbl:'Livraisons',badge:2},
+    {id:'stock',ico:'🏭',lbl:'Stock',badge:1},
+    {id:'clients',ico:'👥',lbl:'Clients'},
+    {id:'incidents',ico:'🚨',lbl:'Incidents',badge:2},
+    {id:'stats',ico:'📊',lbl:'Statistiques'},
+  ],
+  driver:[
+    {id:'driver',ico:'🚛',lbl:'Mes livraisons',badge:2},
+    {id:'stock',ico:'🏭',lbl:'Stock'},
+    {id:'incidents',ico:'🚨',lbl:'Signaler incident'},
+  ],
+  client:[
+    {id:'client-track',ico:'📍',lbl:'Suivi livraison'},
+  ],
+};
+const TITLES={dashboard:'Dashboard',livraisons:'Livraisons',stock:'Stock',clients:'Clients',incidents:'Incidents',stats:'Statistiques',driver:'Mes livraisons','client-track':'Suivi livraison'};
+
+// ════════════════════════════════════
+// INIT
+// ════════════════════════════════════
+window.addEventListener('DOMContentLoaded',()=>{
+  renderNav(); renderKPIs(); renderChart7d(); renderTimeline(); renderDonut(); renderDashStockAlerts();
+  renderDeliveries(); renderStockPage(); renderClients(); renderIncidents();
+  renderDriverView(); renderClientTrack(); renderNotifs(); renderStats();
+  initSig(); addMatLine(); addMatLine();
+  document.getElementById('f-date').value = new Date().toISOString().slice(0,16);
+});
+
+// ════════════════════════════════════
+// NAV
+// ════════════════════════════════════
+function renderNav(){
+  const items = NAV[role]||NAV.admin;
+  document.getElementById('sidebar-nav').innerHTML = items.map(it=>`
+    <div class="nav-item ${it.id===curPage?'active':''}" onclick="showPage('${it.id}')">
+      <span class="nav-icon">${it.ico}</span>
+      <span>${it.lbl}</span>
+      ${it.badge?`<span class="nav-badge">${it.badge}</span>`:''}
+    </div>`).join('');
+}
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el = document.getElementById('page-'+id);
+  if(el) el.classList.add('active');
+  curPage=id;
+  document.getElementById('topbar-title').textContent = TITLES[id]||id;
+  renderNav();
+  if(window.innerWidth<800) closeSidebar();
+}
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').style.display =
+    document.getElementById('sidebar').classList.contains('open') ? 'block' : 'none';
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').style.display='none';
+}
+
+function switchRole(r,btn){
+  role=r;
+  document.querySelectorAll('.rs-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const info={admin:{av:'AD',cls:'av-admin',name:'Administrateur',r:'admin · en ligne',email:'admin@plaquistepro.fr',page:'dashboard'},
+               driver:{av:'JM',cls:'av-driver',name:'Jean-Pierre Martin',r:'chauffeur · en ligne',email:'jp.martin@plaquistepro.fr',page:'driver'},
+               client:{av:'PD',cls:'av-client',name:'Pierre Dupont',r:'client · SARL Dupont',email:'p.dupont@sarl-dupont.fr',page:'client-track'}};
+  const u=info[r];
+  document.getElementById('sb-avatar').textContent=u.av;
+  document.getElementById('sb-avatar').className='avatar '+u.cls;
+  document.getElementById('sb-name').textContent=u.name;
+  document.getElementById('sb-role').textContent=u.r;
+  document.getElementById('prf-avatar').textContent=u.av;
+  document.getElementById('prf-avatar').className='avatar '+u.cls;
+  document.getElementById('prf-name').textContent=u.name;
+  document.getElementById('prf-email').textContent=u.email;
+  curPage=u.page; showPage(u.page);
+  toast({admin:'Vue Administrateur ⚙️',driver:'Vue Chauffeur 🚛',client:'Vue Client 👤'}[r],'ok');
+}
+
+function toggleTheme(){
+  const t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  document.querySelector('[onclick="toggleTheme()"]').textContent=t==='dark'?'🌙':'☀️';
+}
+
+// ════════════════════════════════════
+// KPIs
+// ════════════════════════════════════
+function renderKPIs(){
+  const tot=DELIVERIES.length, tr=DELIVERIES.filter(d=>d.status==='in_transit').length,
+        dv=DELIVERIES.filter(d=>d.status==='delivered').length,
+        inc=INCIDENTS.filter(i=>i.status==='open').length,
+        ls=STOCK.filter(s=>s.qty<=s.min).length;
+  document.getElementById('kpi-grid').innerHTML=[
+    {cls:'blue',ico:'📦',val:tot,lbl:'Total livraisons',sub:`${tr} en cours`,trend:'+12%',tup:true,page:'livraisons'},
+    {cls:'green',ico:'✅',val:dv,lbl:'Livrés aujourd\'hui',sub:`Taux: ${Math.round(dv/tot*100)}%`,trend:'+5%',tup:true,page:'livraisons'},
+    {cls:'amber',ico:'⚠️',val:ls,lbl:'Alertes stock',sub:`${STOCK.length} produits`,trend:'+1',tup:false,page:'stock'},
+    {cls:'red',ico:'🚨',val:inc,lbl:'Incidents ouverts',sub:'à traiter',trend:'',tup:false,page:'incidents'},
+  ].map(k=>`<div class="kpi ${k.cls}" onclick="showPage('${k.page}')">
+    <div class="kpi-ico">${k.ico}</div>
+    <div class="kpi-val">${k.val}</div>
+    <div class="kpi-lbl">${k.lbl}</div>
+    <div class="kpi-sub">${k.sub}</div>
+    ${k.trend?`<div class="kpi-trend ${k.tup?'t-up':'t-dn'}">${k.trend}</div>`:''}
+  </div>`).join('');
+}
+
+// ════════════════════════════════════
+// CHARTS
+// ════════════════════════════════════
+function barChart(containerId, data, labels, colorClass){
+  const max=Math.max(...data,1);
+  document.getElementById(containerId).innerHTML=data.map((v,i)=>`
+    <div class="c-col">
+      <div class="c-val">${v||''}</div>
+      <div class="c-bar ${colorClass}" style="height:${Math.round(v/max*90)+5}%" data-v="${v}"></div>
+      <div class="c-lbl">${labels[i]}</div>
+    </div>`).join('');
+}
+
+function renderChart7d(){
+  barChart('chart-7d',[8,12,6,15,10,18,14],['L','M','M','J','V','S','D'],'accent');
+}
+function renderStats(){
+  barChart('chart-monthly',[42,58,35,72,65,80,54,90,78,88,95,83],['J','F','M','A','M','J','J','A','S','O','N','D'],'accent');
+  barChart('chart-cats',[85,60,75,45,30],['Plaques','Ossature','Enduits','Isolation','Visserie'],'amber');
+  document.getElementById('top-drivers').innerHTML=[
+    {n:'Jean-Pierre Martin',del:42,rate:'96%',c:'var(--green)'},
+    {n:'Mohamed Alaoui',del:38,rate:'94%',c:'var(--accent)'},
+    {n:'Thomas Bernard',del:31,rate:'90%',c:'var(--amber)'},
+  ].map((d,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)">
+    <div style="width:26px;height:26px;border-radius:50%;background:${d.c};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0">${i+1}</div>
+    <div style="flex:1"><div style="font-size:13px;font-weight:600">${d.n}</div><div style="font-size:10px;color:var(--text2);font-family:var(--mono)">${d.del} livraisons</div></div>
+    <div style="font-size:13px;font-weight:700;color:${d.c};font-family:var(--mono)">${d.rate}</div>
+  </div>`).join('');
+}
+
+function renderDonut(){
+  const data=[{lbl:'Attente',pct:40,c:'#f59e0b'},{lbl:'Transit',pct:20,c:'#3b82f6'},{lbl:'Livrés',pct:30,c:'#10b981'},{lbl:'Incidents',pct:10,c:'#ef4444'}];
+  const r=36,cx=45,cy=45,circ=2*Math.PI*r; let off=0;
+  const segs=data.map(d=>{const dash=d.pct/100*circ,s=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${d.c}" stroke-width="11" stroke-dasharray="${dash} ${circ-dash}" stroke-dashoffset="${-off}" stroke-linecap="round"/>`;off+=dash;return s;}).join('');
+  document.getElementById('donut').innerHTML=`
+    <div class="donut"><svg viewBox="0 0 90 90" width="90" height="90"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--surf3)" stroke-width="11"/>${segs}</svg>
+    <div class="donut-label"><div class="donut-pct">94%</div><div class="donut-sub">succès</div></div></div>
+    <div class="legend">${data.map(d=>`<div class="legend-row"><div class="leg-dot" style="background:${d.c}"></div><span style="color:var(--text2)">${d.lbl}</span><span style="margin-left:auto;font-weight:700;font-family:var(--mono)">${d.pct}%</span></div>`).join('')}</div>`;
+}
+
+function renderTimeline(){
+  const evs=[
+    {st:'done',t:'08h15',h:'REF-2024-0038 livré',s:'Leblanc · T. Bernard'},
+    {st:'tran',t:'09h30',h:'REF-2024-0041 en transit',s:'Dupont · J-P. Martin'},
+    {st:'wait',t:'11h00',h:'REF-2024-0042 planifié',s:'Martin · M. Alaoui'},
+    {st:'inc', t:'11h30',h:'Incident REF-2024-0039',s:'BTP Renaud · adresse introuvable'},
+    {st:'wait',t:'14h00',h:'REF-2024-0044 planifié',s:'Dupont · T. Bernard'},
+  ];
+  document.getElementById('timeline').innerHTML=evs.map(e=>`<div class="tl-item"><div class="tl-dot td-${e.st}"></div><div class="tl-t">${e.t}</div><div class="tl-h">${e.h}</div><div class="tl-s">${e.s}</div></div>`).join('');
+}
+
+// ════════════════════════════════════
+// STOCK
+// ════════════════════════════════════
+function renderDashStockAlerts(){
+  const low=STOCK.filter(s=>s.qty<=s.min);
+  document.getElementById('dash-stock-alerts').innerHTML=low.map(s=>{
+    const pct=Math.round(s.qty/s.min*100),crit=s.qty<=s.min*0.5;
+    return `<div class="stock-item">
+      <div style="flex:1;min-width:0"><div class="s-name">${s.n}</div><div class="s-ref">${s.ref}</div></div>
+      <div class="prog-wrap" style="flex:.8"><div class="prog-bar ${crit?'p-crit':'p-low'}" style="width:${pct}%"></div></div>
+      <div class="s-qty" style="color:${crit?'var(--red)':'var(--amber)'}">${s.qty}/${s.min}</div>
+    </div>`;}).join('')||'<div style="color:var(--text2);font-size:12px;padding:8px 0">Aucune alerte ✅</div>';
+}
+
+function renderStockPage(){
+  document.getElementById('stock-full').innerHTML=STOCK.map(s=>{
+    const pct=Math.min(100,Math.round(s.qty/s.min*100)),cls=s.qty<=s.min*.5?'p-crit':s.qty<=s.min?'p-low':'p-ok';
+    return `<div class="stock-item">
+      <div style="flex:1;min-width:0"><div class="s-name">${s.n}</div><div class="s-ref">${s.ref} · ${s.cat}</div></div>
+      <div style="width:90px"><div class="prog-wrap"><div class="prog-bar ${cls}" style="width:${pct}%"></div></div>
+      <div class="s-qty" style="font-size:11px;margin-top:2px;color:${cls==='p-crit'?'var(--red)':cls==='p-low'?'var(--amber)':'var(--text2)'}">${s.qty} ${s.u}</div></div>
+    </div>`;}).join('');
+
+  const low=STOCK.filter(s=>s.qty<=s.min);
+  document.getElementById('stock-alerts-pg').innerHTML=low.map(s=>{
+    const crit=s.qty<=s.min*.5;
+    return `<div style="display:flex;align-items:center;gap:8px;padding:9px;background:${crit?'rgba(239,68,68,.06)':'rgba(245,158,11,.06)'};border-radius:8px;margin-bottom:5px">
+      <span style="font-size:16px">${crit?'🔴':'🟡'}</span>
+      <div style="flex:1"><div style="font-size:12px;font-weight:600">${s.n}</div><div style="font-size:10px;font-family:var(--mono);color:var(--text2)">${s.qty}/${s.min} ${s.u}</div></div>
+      <button class="btn btn-g btn-sm" onclick="toast('Commande créée ✅','ok')">Commander</button>
+    </div>`;}).join('');
+
+  barChart('chart-cats',[85,60,75,45,30],['Plaques','Ossature','Enduits','Isolation','Visserie'],'amber');
+}
+
+// ════════════════════════════════════
+// DELIVERIES
+// ════════════════════════════════════
+const SL={pending:'⏳ En attente',in_transit:'🚛 Transit',delivered:'✅ Livré',incident:'⚠️ Incident'};
+const SC={pending:'c-wait',in_transit:'c-tran',delivered:'c-done',incident:'c-inc'};
+const BC={pending:'b-wait',in_transit:'b-tran',delivered:'b-done',incident:'b-inc'};
+
+function renderDeliveries(){
+  let list=DELIVERIES;
+  if(delFilter!=='all') list=list.filter(d=>d.status===delFilter);
+  if(delSearch){const q=delSearch.toLowerCase();list=list.filter(d=>d.client.toLowerCase().includes(q)||d.addr.toLowerCase().includes(q)||d.ref.toLowerCase().includes(q));}
+  const ts=d=>new Date(d.date).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('del-list').innerHTML=list.length?list.map(d=>`
+    <div class="dl-card" onclick="openDetail('${d.id}')">
+      <div class="dl-bar ${BC[d.status]||'b-wait'}"></div>
+      <div>
+        <div class="dl-client">${d.client}</div>
+        <div class="dl-addr">📍 ${d.addr}</div>
+        <div class="dl-meta">
+          <span class="chip ${SC[d.status]}">${SL[d.status]}</span>
+          ${d.priority==='urgent'?'<span class="chip c-urg">🔴 Urgent</span>':''}
+          <span class="chip c-gray">${d.ref}</span>
+          ${d.driver?`<span class="chip c-gray">🚛 ${d.driver.split(' ').at(-1)}</span>`:''}
+        </div>
+      </div>
+      <div class="dl-right">
+        <span class="dl-time">${ts(d)}</span>
+        ${d.status==='pending'||d.status==='in_transit'?`<button class="btn btn-p btn-sm" onclick="event.stopPropagation();openSig('${d.id}')">✅ Livrer</button>`:''}
+      </div>
+    </div>`).join(''):'<div class="empty-state"><div class="empty-ico">🔍</div><div class="empty-ttl">Aucun résultat</div></div>';
+}
+
+function filterDel(v){delSearch=v;renderDeliveries();}
+function setFilter(f,btn){
+  delFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active-f'));
+  btn.classList.add('active-f');
+  renderDeliveries();
+}
+
+function openDetail(id){
+  const d=DELIVERIES.find(x=>x.id===id); if(!d) return;
+  document.getElementById('detail-content').innerHTML=`
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+      <div><div style="font-size:20px;font-weight:800;letter-spacing:-.4px">${d.client}</div><div style="font-size:12px;color:var(--text2);font-family:var(--mono);margin-top:2px">${d.ref}</div></div>
+      <div class="sb sb-${d.status==='in_transit'?'tran':d.status==='delivered'?'done':d.status==='incident'?'inc':'wait'}">
+        <span class="sb-dot ${d.status==='in_transit'?'anim':''}"></span>${SL[d.status]}
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div style="background:var(--surf2);border-radius:10px;padding:12px">
+        <div style="font-size:9px;font-family:var(--mono);color:var(--text2);margin-bottom:5px">ADRESSE</div>
+        <div style="font-size:13px;font-weight:600">📍 ${d.addr}</div>
+        <a href="https://waze.com/ul?ll=${d.lat},${d.lon}&navigate=yes" target="_blank" style="display:inline-flex;align-items:center;gap:4px;margin-top:7px;color:var(--accentG);font-size:12px;font-weight:600;text-decoration:none">🗺️ Ouvrir Waze</a>
+      </div>
+      <div style="background:var(--surf2);border-radius:10px;padding:12px">
+        <div style="font-size:9px;font-family:var(--mono);color:var(--text2);margin-bottom:5px">CHAUFFEUR</div>
+        <div style="font-size:13px;font-weight:600">🚛 ${d.driver||'Non assigné'}</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:3px">📅 ${new Date(d.date).toLocaleDateString('fr-FR',{weekday:'short',day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'})}</div>
+      </div>
+    </div>
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px">
+      ${d.items.map((it,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 13px;${i<d.items.length-1?'border-bottom:1px solid var(--border)':''}"><span style="font-size:13px;font-weight:500">${it.n}</span><span style="font-size:11px;font-family:var(--mono);background:var(--surf2);padding:2px 9px;border-radius:6px">${it.q} ${it.u}</span></div>`).join('')}
+    </div>
+    ${d.notes?`<div style="background:var(--surf2);border-radius:9px;padding:11px;margin-bottom:10px;font-size:12px"><span style="font-weight:700">Notes: </span>${d.notes}</div>`:''}
+    ${d.incident?`<div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:9px;padding:11px;margin-bottom:10px"><div style="font-size:9px;font-family:var(--mono);color:var(--red);margin-bottom:3px">INCIDENT</div><div style="font-size:12px">${d.incident}</div></div>`:''}
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      ${d.status!=='delivered'?`<button class="btn btn-p btn-sm" onclick="closeModal('modal-del-detail');openSig('${d.id}')">✅ Confirmer livraison</button>`:''}
+      <button class="btn btn-g btn-sm" onclick="genPDF()">📄 PDF</button>
+      <a href="https://waze.com/ul?ll=${d.lat},${d.lon}" target="_blank" class="btn btn-g btn-sm">🗺️ Waze</a>
+      <button class="btn btn-g btn-sm" onclick="navigator.clipboard?.writeText('${d.addr.replace(/'/g,"\\'")}');toast('Adresse copiée 📋','ok')">📋 Copier adresse</button>
+    </div>`;
+  openModal('modal-del-detail');
+}
+
+// ════════════════════════════════════
+// CLIENTS
+// ════════════════════════════════════
+function renderClients(){
+  document.getElementById('clients-tbody').innerHTML=CLIENTS.map(c=>`
+    <tr onclick="toast('${c.co}','info')">
+      <td><strong>${c.co}</strong></td>
+      <td>${c.ct}</td>
+      <td style="font-family:var(--mono);font-size:11px">${c.ph}</td>
+      <td style="font-weight:700">${c.ord}</td>
+      <td><span class="chip ${c.active?'c-done':'c-inc'}">${c.active?'✅ Actif':'⛔ Inactif'}</span></td>
+      <td><div style="display:flex;gap:5px">
+        <button class="btn btn-g btn-sm" onclick="event.stopPropagation();toast('Édition client','info')">✏️</button>
+        <button class="btn btn-p btn-sm" onclick="event.stopPropagation();openModal('modal-new-del')">+ Livraison</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+// ════════════════════════════════════
+// INCIDENTS
+// ════════════════════════════════════
+function renderIncidents(){
+  const tl={damage:'Dommage',missing:'Manquant',wrong_address:'Mauvaise adresse',refused:'Refusé',other:'Autre'};
+  const sc={open:'c-inc',in_review:'c-wait',resolved:'c-done'};
+  const sl={open:'🔴 Ouvert',in_review:'🟡 En cours',resolved:'✅ Résolu'};
+  document.getElementById('incidents-list').innerHTML=INCIDENTS.map(i=>`
+    <div class="inc-card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;flex-wrap:wrap">
+        <div class="inc-type">${tl[i.type]||i.type}</div>
+        <span class="chip ${sc[i.status]}">${sl[i.status]}</span>
+        <span class="chip c-gray" style="margin-left:auto">${i.ref}</span>
+      </div>
+      <div style="font-size:13px;color:var(--text);margin-bottom:7px">${i.desc}</div>
+      <div style="font-size:10px;color:var(--text2);font-family:var(--mono);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span>🚛 ${i.drv}</span>
+        <span>📅 ${new Date(i.date).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>
+        ${i.status!=='resolved'?`<button class="btn btn-ok btn-sm" style="margin-left:auto" onclick="resolveInc('${i.id}',this)">✓ Résoudre</button>`:''}
+      </div>
+    </div>`).join('');
+}
+function resolveInc(id,btn){const i=INCIDENTS.find(x=>x.id===id);if(i)i.status='resolved';renderIncidents();toast('Incident résolu ✅','ok');}
+
+// ════════════════════════════════════
+// DRIVER VIEW
+// ════════════════════════════════════
+function renderDriverView(){
+  const list=DELIVERIES.filter(d=>d.status==='in_transit'||d.status==='pending');
+  document.getElementById('driver-list').innerHTML=list.length?list.map((d,i)=>`
+    <div class="drv-card">
+      <div class="drv-hdr">
+        <div class="drv-num">${i+1}</div>
+        <div class="drv-main">
+          <div class="drv-client">${d.client}</div>
+          <div class="drv-addr">📍 ${d.addr}</div>
+          <div class="drv-meta">
+            <span class="chip ${SC[d.status]}">${SL[d.status]}</span>
+            ${d.priority==='urgent'?'<span class="chip c-urg">🔴 Urgent</span>':''}
+            <span class="chip c-gray">📅 ${new Date(d.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</span>
+          </div>
+        </div>
+      </div>
+      <div class="drv-mats">${d.items.map(it=>`<div class="mat-row"><span>${it.n}</span><span class="mat-qty">${it.q} ${it.u}</span></div>`).join('')}</div>
+      <div class="drv-foot">
+        <a href="https://waze.com/ul?ll=${d.lat},${d.lon}&navigate=yes" target="_blank" class="btn btn-g btn-sm">🗺️ Waze</a>
+        <button class="btn btn-g btn-sm" onclick="navigator.clipboard?.writeText('${d.addr.replace(/'/g,"\\'")}');toast('Adresse copiée 📋','ok')">📋 Adresse</button>
+        ${d.status==='pending'?`<button class="btn btn-p btn-sm" onclick="takeDelivery('${d.id}',this)">🚛 Prendre en charge</button>`:''}
+        ${d.status==='in_transit'?`<button class="btn btn-ok btn-sm" onclick="openSig('${d.id}')">✅ Livrer</button><button class="btn btn-d btn-sm" onclick="signalInc('${d.id}')">⚠️ Incident</button>`:''}
+      </div>
+    </div>`).join(''):'<div class="empty-state"><div class="empty-ico">🚛</div><div class="empty-ttl">Aucune livraison assignée</div></div>';
+}
+function takeDelivery(id){const d=DELIVERIES.find(x=>x.id===id);if(d)d.status='in_transit';renderDriverView();renderDeliveries();renderKPIs();toast('Livraison prise en charge 🚛','ok');if(navigator.vibrate)navigator.vibrate([50]);}
+function signalInc(id){const desc=prompt('Décrivez le problème :');if(!desc)return;const d=DELIVERIES.find(x=>x.id===id);if(d){d.status='incident';d.incident=desc;}renderDriverView();renderDeliveries();renderKPIs();renderIncidents();toast('Incident signalé ⚠️','err');if(navigator.vibrate)navigator.vibrate([100,50,100]);}
+
+// ════════════════════════════════════
+// CLIENT TRACKING
+// ════════════════════════════════════
+function renderClientTrack(){
+  const list=DELIVERIES.filter(d=>d.client==='SARL Dupont Bâtiment');
+  document.getElementById('client-del-list').innerHTML=list.map(d=>`
+    <div class="card" style="margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div><div style="font-size:15px;font-weight:700">${d.ref}</div><div style="font-size:12px;color:var(--text2);margin-top:2px">📍 ${d.addr}</div></div>
+        <span class="chip ${SC[d.status]}">${SL[d.status]}</span>
+      </div>
+      <div style="font-size:11px;color:var(--text2);font-family:var(--mono);margin-top:10px">
+        ${d.items.map(it=>`${it.q} ${it.u} ${it.n}`).join(' · ')}
+      </div>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════
+// NOTIFICATIONS
+// ════════════════════════════════════
+function renderNotifs(){
+  document.getElementById('notif-list').innerHTML=NOTIFS.map(n=>`
+    <div class="np-item" onclick="markRead('${n.id}')">
+      <div style="display:flex;align-items:flex-start;gap:8px">
+        ${!n.read?'<div class="np-unread" style="margin-top:4px;flex-shrink:0"></div>':'<div style="width:6px;flex-shrink:0"></div>'}
+        <div>
+          <div class="np-title">${n.title}</div>
+          <div class="np-body">${n.body}</div>
+          <div class="np-time">${n.time}</div>
+        </div>
+      </div>
+    </div>`).join('');
+  const unread=NOTIFS.filter(n=>!n.read).length;
+  document.getElementById('notif-indicator').style.display=unread>0?'block':'none';
+}
+function toggleNotifs(){notifOpen=!notifOpen;document.getElementById('notif-panel').classList.toggle('open',notifOpen);}
+function markRead(id){const n=NOTIFS.find(x=>x.id===id);if(n)n.read=true;renderNotifs();}
+function markAllRead(){NOTIFS.forEach(n=>n.read=true);renderNotifs();toast('Tout marqué comme lu','ok');}
+document.addEventListener('click',e=>{if(notifOpen&&!e.target.closest('#notif-btn')&&!e.target.closest('#notif-panel')){notifOpen=false;document.getElementById('notif-panel').classList.remove('open');}});
+
+// ════════════════════════════════════
+// SIGNATURE
+// ════════════════════════════════════
+function initSig(){
+  sigCanvas=document.getElementById('sig-canvas');
+  sigCtx=sigCanvas.getContext('2d');
+  function resize(){const r=sigCanvas.getBoundingClientRect();sigCanvas.width=r.width||400;sigCanvas.height=r.height||160;sigCtx.strokeStyle='#0f172a';sigCtx.lineWidth=2.5;sigCtx.lineCap='round';sigCtx.lineJoin='round';}
+  setTimeout(resize,200);window.addEventListener('resize',resize);
+  function pos(e){const r=sigCanvas.getBoundingClientRect(),s=e.touches?.[0]??e;return{x:s.clientX-r.left,y:s.clientY-r.top};}
+  sigCanvas.addEventListener('mousedown', e=>{sigDrawing=true;const p=pos(e);sigCtx.beginPath();sigCtx.moveTo(p.x,p.y);});
+  sigCanvas.addEventListener('mousemove', e=>{if(!sigDrawing)return;const p=pos(e);sigCtx.lineTo(p.x,p.y);sigCtx.stroke();});
+  sigCanvas.addEventListener('mouseup',   ()=>sigDrawing=false);
+  sigCanvas.addEventListener('touchstart',e=>{sigDrawing=true;const p=pos(e);sigCtx.beginPath();sigCtx.moveTo(p.x,p.y);e.preventDefault();},{passive:false});
+  sigCanvas.addEventListener('touchmove', e=>{if(!sigDrawing)return;const p=pos(e);sigCtx.lineTo(p.x,p.y);sigCtx.stroke();e.preventDefault();},{passive:false});
+  sigCanvas.addEventListener('touchend',  ()=>sigDrawing=false);
+}
+function clearSig(){if(sigCtx)sigCtx.clearRect(0,0,sigCanvas.width,sigCanvas.height);}
+function openSig(id){pendingDelId=id;clearSig();setTimeout(()=>{const r=sigCanvas.getBoundingClientRect();sigCanvas.width=r.width||400;sigCanvas.height=r.height||160;sigCtx.strokeStyle='#0f172a';sigCtx.lineWidth=2.5;sigCtx.lineCap='round';},150);openModal('modal-sig');}
+function confirmDelivery(){
+  const data=sigCtx.getImageData(0,0,sigCanvas.width,sigCanvas.height).data;
+  if(!data.some(v=>v!==0)){toast('Veuillez signer d\'abord','err');return;}
+  const d=DELIVERIES.find(x=>x.id===pendingDelId);
+  if(d){d.status='delivered';d.sig=sigCanvas.toDataURL();}
+  closeModal('modal-sig');
+  renderDeliveries();renderDriverView();renderKPIs();renderTimeline();renderClientTrack();
+  toast('Livraison confirmée avec signature ✅','ok');
+  if(navigator.vibrate)navigator.vibrate([80,40,80,40,80]);
+}
+
+// ════════════════════════════════════
+// FORM — MAT LINES
+// ════════════════════════════════════
+const MAT_SUGGESTIONS=['Plaque BA13 standard','Plaque BA13 hydrofuge (RH)','Plaque BA13 coupe-feu (RF)','Plaque Fermacell 12.5mm','Rail 48mm','Rail 70mm','Rail 100mm','Montant 48mm','Montant 70mm','Fourrure 60/27','Suspente réglable','Enduit Knauf','Enduit lissage Siniat','Bande à joint papier','Bande armée 50mm','Laine de verre 100mm','Laine de roche 100mm','Vis TF 25mm (boite 1000)','Vis TB 25mm (boite 1000)','Mousse expansive','Colle Placol'];
+
+function addMatLine(){
+  matLineCount++;
+  const id=matLineCount;
+  const row=document.createElement('div');
+  row.className='mat-line-wrap'; row.id='ml-'+id;
+  row.innerHTML=`
+    <input class="mat-name-inp" type="text" list="mls-${id}" placeholder="Matériau" autocomplete="off">
+    <datalist id="mls-${id}">${MAT_SUGGESTIONS.map(s=>`<option value="${s}">`).join('')}</datalist>
+    <input class="mat-qty-inp" type="number" min="1" value="1" placeholder="Qté">
+    <input class="mat-unit-inp" type="text" placeholder="unité" value="plaques">
+    <button class="btn-rm-line" onclick="document.getElementById('ml-${id}').remove()">✕</button>`;
+  document.getElementById('f-mat-lines').appendChild(row);
+}
+
+// ════════════════════════════════════
+// MODALS
+// ════════════════════════════════════
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-ov').forEach(ov=>ov.addEventListener('click',e=>{if(e.target===ov)ov.classList.remove('open');}));
+
+function createDelivery(){
+  closeModal('modal-new-del');
+  const newD={id:'D'+(DELIVERIES.length+10),ref:'REF-2024-00'+(44+DELIVERIES.length),client:'SARL Dupont Bâtiment',addr:'Nouvelle adresse, Lyon',driver:'Mohamed Alaoui',status:'pending',priority:'normal',date:new Date().toISOString(),lat:45.75,lon:4.83,items:[{n:'Plaque BA13 standard',q:50,u:'plaques'}],notes:''};
+  DELIVERIES.unshift(newD);
+  renderDeliveries();renderKPIs();renderTimeline();
+  toast('Livraison créée ✅','ok');
+  if(navigator.vibrate)navigator.vibrate([50,30,50]);
+}
+
+function createClient(){
+  closeModal('modal-new-client');
+  toast('Client créé ✅','ok');
+}
+
+function genPDF(){
+  toast('Génération PDF en cours... 📄','info');
+  setTimeout(()=>toast('PDF prêt à télécharger 📥','ok'),1500);
+}
+
+// ════════════════════════════════════
+// TOAST
+// ════════════════════════════════════
+function toast(msg,type=''){
+  const el=document.createElement('div');
+  el.className='toast '+(type||'');
+  el.textContent=msg;
+  document.getElementById('toast-area').appendChild(el);
+  setTimeout(()=>el.remove(),2800);
+}
+</script>
+</body>
+</html>
