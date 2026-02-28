@@ -1,0 +1,22 @@
+{
+  "name": "PlaquistePro ERP",
+  "short_name": "PlaquistePro",
+  "description": "ERP gestion livraisons plaquistes",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#080c14",
+  "theme_color": "#3b82f6",
+  "lang": "fr",
+  "categories": ["business","productivity"],
+  "icons": [
+    {"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+  ],
+  "shortcuts": [
+    {"name":"Livraisons","url":"./index.html?page=livraisons","description":"Livraisons"},
+    {"name":"Clients","url":"./index.html?page=clients","description":"Clients"},
+    {"name":"Stock","url":"./index.html?page=marchandises","description":"Stock"}
+  ]
+}
