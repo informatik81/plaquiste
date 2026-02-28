@@ -5,7 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#080c14">
+<meta name="theme-color" content="#3b82f6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PlaquistePro">
+<meta name="application-name" content="PlaquistePro">
+<meta name="msapplication-TileColor" content="#3b82f6">
+<link rel="manifest" href="manifest.json">
 <title>PlaquistePro ERP</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -443,12 +449,181 @@ td{padding:11px 13px;vertical-align:middle;}
 
 /* ── CONFIRM DIALOG ── */
 .confirm-modal .modal-title{color:var(--red);}
+
+/* ══════════════════════════════════════════════
+   MOBILE / PWA
+══════════════════════════════════════════════ */
+
+/* Bottom Navigation */
+#bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  height:64px;background:var(--bg2);
+  border-top:1px solid var(--border);
+  z-index:200;
+  padding:0 4px;
+  padding-bottom:env(safe-area-inset-bottom);
+  grid-template-columns:repeat(5,1fr);
+  align-items:stretch;
+}
+@media(max-width:768px){
+  #bottom-nav{display:grid;}
+  #content{padding-bottom:72px;}
+  #sidebar{display:none!important;}
+  #topbar .icon-btn:first-child{display:none;}
+}
+.bn-item{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;cursor:pointer;border:none;background:none;
+  color:var(--text3);font-family:var(--font);font-size:9px;font-weight:600;
+  letter-spacing:.3px;padding:6px 4px;
+  border-radius:12px;margin:4px 2px;
+  transition:all .15s;position:relative;
+}
+.bn-item:active{transform:scale(.92);}
+.bn-item.active{color:var(--accent);background:rgba(59,130,246,.1);}
+.bn-icon{font-size:22px;line-height:1;}
+.bn-badge{
+  position:absolute;top:4px;right:calc(50% - 16px);
+  background:var(--red);color:#fff;
+  font-size:8px;font-weight:700;font-family:var(--mono);
+  min-width:15px;height:15px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;padding:0 3px;
+  border:1.5px solid var(--bg2);
+}
+
+/* Touch targets — min 48px */
+@media(max-width:768px){
+  .btn{min-height:44px;padding:10px 16px;}
+  .btn-sm{min-height:40px;padding:9px 13px;font-size:12px;}
+  .btn-xs{min-height:36px;padding:7px 10px;font-size:11px;}
+  .fg input,.fg select,.fg textarea{padding:13px 14px;font-size:16px;}
+  .filter-btn{min-height:36px;padding:7px 14px;}
+  .nav-item{padding:12px 10px;min-height:48px;}
+  td{padding:13px 11px;}
+  .lv-card{padding:15px;}
+  .kpi{padding:16px 14px;}
+  .kpi-val{font-size:28px;}
+}
+
+/* Install Banner */
+#install-banner{
+  display:none;
+  position:fixed;bottom:72px;left:10px;right:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border-radius:16px;padding:14px 16px;
+  z-index:300;box-shadow:0 8px 32px rgba(59,130,246,.5);
+  animation:slideUp .3s var(--ease);
+  align-items:center;gap:12px;
+}
+#install-banner.show{display:flex;}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.ib-icon{font-size:28px;flex-shrink:0;}
+.ib-text{flex:1;min-width:0;}
+.ib-title{font-size:14px;font-weight:700;margin-bottom:2px;}
+.ib-sub{font-size:11px;opacity:.85;}
+.ib-btn{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);
+  color:#fff;border-radius:9px;padding:8px 14px;font-size:12px;font-weight:700;
+  cursor:pointer;white-space:nowrap;font-family:var(--font);transition:all .15s;}
+.ib-btn:hover{background:rgba(255,255,255,.3);}
+.ib-close{background:none;border:none;color:rgba(255,255,255,.7);
+  font-size:18px;cursor:pointer;padding:4px;flex-shrink:0;}
+
+/* Offline Banner */
+#offline-banner{
+  display:none;position:fixed;top:54px;left:0;right:0;
+  background:var(--amber);color:#000;
+  padding:10px 16px;font-size:13px;font-weight:600;
+  text-align:center;z-index:400;
+}
+#offline-banner.show{display:block;}
+
+/* Pull to refresh indicator */
+#ptr-indicator{
+  position:fixed;top:54px;left:50%;transform:translateX(-50%);
+  background:var(--surf);border:1px solid var(--border);
+  border-radius:20px;padding:7px 16px;font-size:12px;color:var(--text2);
+  z-index:300;display:none;align-items:center;gap:6px;
+  box-shadow:0 4px 16px var(--shadow);
+}
+#ptr-indicator.show{display:flex;}
+
+/* Mobile cards — fullwidth on small screens */
+@media(max-width:768px){
+  .g2,.g3,.g4{grid-template-columns:1fr;}
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .form-grid,.form-grid-3{grid-template-columns:1fr;}
+  .detail-grid{grid-template-columns:1fr;}
+  .tbl-wrap{border-radius:var(--r);}
+  th,td{font-size:12px;padding:10px 10px;}
+  .modal{border-radius:var(--r-lg) var(--r-lg) 0 0;max-height:92vh;}
+  .modal-ov{align-items:flex-end;padding:0;}
+  .page{padding:12px 12px 80px;}
+  .sec-title{font-size:18px;}
+}
+
+/* Haptic feedback visual */
+@keyframes haptic{0%,100%{transform:scale(1)}50%{transform:scale(.96)}}
+.haptic{animation:haptic .12s var(--ease);}
+
+/* Swipe hint */
+.swipe-hint{
+  text-align:center;font-size:10px;color:var(--text3);
+  font-family:var(--mono);padding:4px;
+  display:none;
+}
+@media(max-width:768px){.swipe-hint{display:block;}}
+
+/* Loading splash */
+#splash{
+  position:fixed;inset:0;z-index:2000;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .4s;
+}
+#splash.hidden{opacity:0;pointer-events:none;}
+.splash-logo{
+  width:80px;height:80px;border-radius:22px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;margin-bottom:20px;
+  box-shadow:0 12px 40px rgba(59,130,246,.5);
+  animation:splashPulse 1.5s ease-in-out infinite;
+}
+@keyframes splashPulse{0%,100%{transform:scale(1);box-shadow:0 12px 40px rgba(59,130,246,.5)}50%{transform:scale(1.05);box-shadow:0 16px 50px rgba(59,130,246,.7)}}
+.splash-title{font-size:24px;font-weight:800;letter-spacing:-.5px;margin-bottom:6px;}
+.splash-sub{font-size:11px;color:var(--text2);font-family:var(--mono);letter-spacing:2px;}
+.splash-bar{width:160px;height:3px;background:var(--border);border-radius:2px;margin-top:32px;overflow:hidden;}
+.splash-progress{height:100%;background:linear-gradient(90deg,var(--accent),var(--accentG,#06b6d4));border-radius:2px;animation:splashLoad 1.8s ease-in-out forwards;}
+@keyframes splashLoad{from{width:0}to{width:100%}}
 </style>
 </head>
 <body>
 
 <!-- OVERLAY mobile -->
 <div id="overlay" onclick="closeSidebar()"></div>
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <div class="splash-logo">🏗️</div>
+  <div class="splash-title">PlaquistePro</div>
+  <div class="splash-sub">ERP · LIVRAISONS</div>
+  <div class="splash-bar"><div class="splash-progress"></div></div>
+</div>
+
+<!-- OFFLINE BANNER -->
+<div id="offline-banner">📡 Hors-ligne — Les données affichées peuvent ne pas être à jour</div>
+
+<!-- INSTALL BANNER (PWA) -->
+<div id="install-banner">
+  <div class="ib-icon">🏗️</div>
+  <div class="ib-text">
+    <div class="ib-title">Installer PlaquistePro</div>
+    <div class="ib-sub">Accès rapide depuis votre écran d'accueil</div>
+  </div>
+  <button class="ib-btn" id="btn-install">Installer</button>
+  <button class="ib-close" onclick="dismissInstall()">✕</button>
+</div>
 
 <!-- ══════════════════════════════════════
      AUTH SCREEN
@@ -983,6 +1158,27 @@ td{padding:11px 13px;vertical-align:middle;}
 </div>
 
 <div id="toast-area"></div>
+
+<!-- BOTTOM NAVIGATION (mobile) -->
+<nav id="bottom-nav">
+  <button class="bn-item active" onclick="showPage('dashboard')" id="bn-dashboard">
+    <span class="bn-icon">🏠</span><span>Accueil</span>
+  </button>
+  <button class="bn-item" onclick="showPage('livraisons')" id="bn-livraisons">
+    <span class="bn-icon">🚛</span><span>Livraisons</span>
+    <span class="bn-badge" id="bn-badge-lv" style="display:none"></span>
+  </button>
+  <button class="bn-item" onclick="showPage('marchandises')" id="bn-marchandises">
+    <span class="bn-icon">📦</span><span>Stock</span>
+    <span class="bn-badge" id="bn-badge-st" style="display:none"></span>
+  </button>
+  <button class="bn-item" onclick="showPage('clients')" id="bn-clients">
+    <span class="bn-icon">👥</span><span>Clients</span>
+  </button>
+  <button class="bn-item" onclick="showPage('equipe')" id="bn-equipe">
+    <span class="bn-icon">👤</span><span>Équipe</span>
+  </button>
+</nav>
 </style>
 <script type="module">
 // ══════════════════════════════════════════════
@@ -999,17 +1195,35 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCBPCmPf4uBlADPU9jWUlrT_sNMLRM2mfc",
+  apiKey: "AIzaSyBBRkVqz1TzTBvXWZUHhyLPFN4hV8mR0cg",
   authDomain: "transport-8a0ce.firebaseapp.com",
   projectId: "transport-8a0ce",
-  storageBucket: "transport-8a0ce.firebasestorage.app",
-  messagingSenderId: "515282750383",
-  appId: "1:515282750383:web:76cc5213ab01452f05fd5a"
+  storageBucket: "transport-8a0ce.appspot.com",
+  messagingSenderId: "1234567890",
+  appId: "1:1234567890:web:abcdef"
 };
 
-const app  = initializeApp(firebaseConfig);
-const db   = getFirestore(app);
-const auth = getAuth(app);
+// ⚠️ CONFIGURATION REQUISE
+// Remplacez les valeurs ci-dessus par vos vraies clés Firebase
+// console.firebase.google.com → transport-8a0ce → ⚙️ Paramètres → Vos applications
+
+let app, db, auth;
+try {
+  app  = initializeApp(firebaseConfig);
+  db   = getFirestore(app);
+  auth = getAuth(app);
+} catch(e) {
+  document.getElementById('splash').innerHTML = `
+    <div style="text-align:center;padding:40px;max-width:360px">
+      <div style="font-size:48px;margin-bottom:16px">⚙️</div>
+      <div style="font-size:18px;font-weight:700;color:#f0f4ff;margin-bottom:10px">Configuration Firebase requise</div>
+      <div style="font-size:13px;color:#8899bb;line-height:1.6;margin-bottom:20px">
+        Remplacez les clés Firebase dans <code style="color:#3b82f6">index.html</code> par vos vraies clés.<br><br>
+        console.firebase.google.com → transport-8a0ce → ⚙️ Paramètres → Vos applications
+      </div>
+      <div style="background:#1a2235;border-radius:10px;padding:14px;font-size:11px;color:#8899bb;font-family:monospace;text-align:left">${e.message}</div>
+    </div>`;
+}
 
 // ══════════════════════════════════════════════
 // STATE
@@ -1052,7 +1266,15 @@ const PAGE_TITLES = {
 // ══════════════════════════════════════════════
 // AUTH
 // ══════════════════════════════════════════════
+// Sécurité : si Firebase ne répond pas en 6s → afficher écran connexion
+const splashTimeout = setTimeout(() => {
+  hideSplash();
+  showAuthScreen();
+  showAuthErr('Impossible de joindre le serveur. Vérifiez votre connexion internet.');
+}, 6000);
+
 onAuthStateChanged(auth, async user => {
+  clearTimeout(splashTimeout);
   if (user) {
     try {
       const snap = await getDoc(doc(db, 'users', user.uid));
@@ -1062,8 +1284,10 @@ onAuthStateChanged(auth, async user => {
     } catch {
       STATE.user = { uid: user.uid, email: user.email, displayName: user.email.split('@')[0], role: 'admin' };
     }
+    hideSplash();
     showApp();
   } else {
+    hideSplash();
     showAuthScreen();
   }
 });
@@ -1103,6 +1327,13 @@ document.getElementById('auth-pass').addEventListener('keydown', e => { if(e.key
 function showAuthErr(msg) {
   const el = document.getElementById('auth-err');
   el.textContent = msg; el.classList.add('show');
+}
+
+function hideSplash() {
+  const splash = document.getElementById('splash');
+  if (!splash) return;
+  splash.classList.add('hidden');
+  setTimeout(() => splash.remove(), 400);
 }
 
 function showAuthScreen() {
@@ -2174,7 +2405,139 @@ document.addEventListener('keydown', e => {
   if (shortcuts[e.key]) showPage(shortcuts[e.key]);
 });
 
+// ══════════════════════════════════════════════
+// PWA — SERVICE WORKER
+// ══════════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('SW enregistré:', reg.scope))
+      .catch(err => console.log('SW erreur:', err));
+  });
+}
+
+// ══════════════════════════════════════════════
+// PWA — INSTALL PROMPT
+// ══════════════════════════════════════════════
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Montrer la bannière après 3 secondes
+  setTimeout(() => {
+    if (!localStorage.getItem('pwa_dismissed')) {
+      document.getElementById('install-banner').classList.add('show');
+    }
+  }, 3000);
+});
+
+document.getElementById('btn-install').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  document.getElementById('install-banner').classList.remove('show');
+  deferredPrompt.prompt();
+  const result = await deferredPrompt.userChoice;
+  if (result.outcome === 'accepted') {
+    toast('✅ PlaquistePro installé sur votre téléphone !', 'ok');
+  }
+  deferredPrompt = null;
+});
+
+window.dismissInstall = () => {
+  document.getElementById('install-banner').classList.remove('show');
+  localStorage.setItem('pwa_dismissed', '1');
+};
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-banner').classList.remove('show');
+  toast('🎉 Application installée !', 'ok');
+  deferredPrompt = null;
+});
+
+// ══════════════════════════════════════════════
+// PWA — OFFLINE DETECTION
+// ══════════════════════════════════════════════
+function updateOnlineStatus() {
+  const banner = document.getElementById('offline-banner');
+  if (!navigator.onLine) {
+    banner.classList.add('show');
+    toast('📡 Connexion perdue — mode hors-ligne', 'err');
+  } else {
+    banner.classList.remove('show');
+  }
+}
+window.addEventListener('online',  updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+
+// ══════════════════════════════════════════════
+// PWA — BOTTOM NAV SYNC
+// ══════════════════════════════════════════════
+const BN_PAGES = ['dashboard','livraisons','marchandises','clients','equipe'];
+
+function updateBottomNav(pageId) {
+  BN_PAGES.forEach(p => {
+    const btn = document.getElementById('bn-'+p);
+    if (btn) btn.classList.toggle('active', p===pageId);
+  });
+}
+
+// Override showPage to sync bottom nav
+const _origShowPage = window.showPage;
+window.showPage = function(id) {
+  _origShowPage(id);
+  updateBottomNav(id);
+  updateBottomNavBadges();
+  // Haptic feedback sur mobile
+  if (navigator.vibrate) navigator.vibrate(8);
+};
+
+function updateBottomNavBadges() {
+  const lvBadge = document.getElementById('bn-badge-lv');
+  const stBadge = document.getElementById('bn-badge-st');
+  if (!lvBadge || !stBadge) return;
+  const lvCount = STATE.livraisons.filter(l=>['pending','assigned'].includes(l.status)).length;
+  const stCount = STATE.products.filter(p=>p.quantity<=p.minQuantity).length;
+  if (lvCount > 0) { lvBadge.textContent=lvCount; lvBadge.style.display='flex'; }
+  else lvBadge.style.display='none';
+  if (stCount > 0) { stBadge.textContent=stCount; stBadge.style.display='flex'; }
+  else stBadge.style.display='none';
+}
+
+// ══════════════════════════════════════════════
+// PWA — SPLASH SCREEN géré par onAuthStateChanged
+// ══════════════════════════════════════════════
+
+// ══════════════════════════════════════════════
+// PWA — SWIPE TO NAVIGATE (mobile)
+// ══════════════════════════════════════════════
+let touchStartX = 0;
+let touchStartY = 0;
+const content = document.getElementById('content');
+
+content.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+content.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) < Math.abs(dy) || Math.abs(dx) < 60) return; // vertical ou trop court
+  const cur = BN_PAGES.indexOf(STATE.currentPage);
+  if (dx < 0 && cur < BN_PAGES.length-1) showPage(BN_PAGES[cur+1]); // swipe gauche → suivant
+  if (dx > 0 && cur > 0) showPage(BN_PAGES[cur-1]); // swipe droite → précédent
+}, { passive: true });
+
+// ══════════════════════════════════════════════
+// CHECK URL PARAMS (shortcuts)
+// ══════════════════════════════════════════════
+const urlParams = new URLSearchParams(window.location.search);
+const paramPage = urlParams.get('page');
+if (paramPage && BN_PAGES.includes(paramPage)) {
+  document.addEventListener('appReady', () => showPage(paramPage));
+}
+
+
 </script>
 </body>
-
 </html>
