@@ -1265,22 +1265,22 @@ const PAGE_TITLES = {
 // ══════════════════════════════════════════════
 // AUTH
 // ══════════════════════════════════════════════
-// Sécurité : si Firebase ne répond pas en 4s → afficher écran connexion
+// Sécurité : si Firebase ne répond pas en 3s → afficher écran connexion
 const splashTimeout = setTimeout(() => {
   hideSplash();
   showAuthScreen();
-}, 4000);
+}, 3000);
 
-// Sur mobile : bouton "passer" après 2s
+// Sur mobile : bouton "passer" après 1.5s
 setTimeout(() => {
   const splash = document.getElementById('splash');
   if (!splash) return;
   const skip = document.createElement('button');
   skip.textContent = 'Appuyez pour continuer →';
-  skip.style.cssText = 'margin-top:24px;background:rgba(59,130,246,.2);border:1px solid rgba(59,130,246,.4);color:#93c5fd;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;';
+  skip.style.cssText = 'margin-top:24px;background:rgba(59,130,246,.2);border:1px solid rgba(59,130,246,.4);color:#93c5fd;padding:12px 24px;border-radius:20px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;min-height:48px;';
   skip.onclick = () => { clearTimeout(splashTimeout); hideSplash(); showAuthScreen(); };
   splash.appendChild(skip);
-}, 2000);
+}, 1500);
 
 onAuthStateChanged(auth, async user => {
   clearTimeout(splashTimeout);
@@ -2415,13 +2415,12 @@ document.addEventListener('keydown', e => {
 });
 
 // ══════════════════════════════════════════════
-// PWA — SERVICE WORKER
+// PWA — SERVICE WORKER (désactivé en prod pour éviter le cache bloquant)
 // ══════════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('SW enregistré:', reg.scope))
-      .catch(err => console.log('SW erreur:', err));
+  // Désinscrire tous les anciens service workers
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    regs.forEach(reg => reg.unregister());
   });
 }
 
