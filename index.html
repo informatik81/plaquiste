@@ -579,7 +579,7 @@ td{padding:11px 13px;vertical-align:middle;}
   position:fixed;inset:0;z-index:2000;
   background:var(--bg);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  transition:opacity .4s;
+  transition:opacity .3s;
 }
 #splash.hidden{opacity:0;pointer-events:none;}
 .splash-logo{
@@ -1196,12 +1196,10 @@ import {
 
 const firebaseConfig = {
   apiKey: "AIzaSyCBPCmPf4uBlADPU9jWUlrT_sNMLRM2mfc",
-  authDomain: "transport-8a0ce.firebaseapp.com",
-  projectId: "transport-8a0ce",
-  storageBucket: "transport-8a0ce.firebasestorage.app",
-  messagingSenderId: "515282750383",
-  appId: "1:515282750383:web:76cc5213ab01452f05fd5a",
-  measurementId: "G-F0HDY95F7N"
+messagingSenderId: "515282750383",
+appId: "1:515282750383:web:76cc5213ab01452f05fd5a",
+measurementId: "G-F0HDY95F7N"
+  appId: "1:1234567890:web:abcdef"
 };
 
 // ⚠️ CONFIGURATION REQUISE
@@ -1267,12 +1265,22 @@ const PAGE_TITLES = {
 // ══════════════════════════════════════════════
 // AUTH
 // ══════════════════════════════════════════════
-// Sécurité : si Firebase ne répond pas en 6s → afficher écran connexion
+// Sécurité : si Firebase ne répond pas en 4s → afficher écran connexion
 const splashTimeout = setTimeout(() => {
   hideSplash();
   showAuthScreen();
-  showAuthErr('Impossible de joindre le serveur. Vérifiez votre connexion internet.');
-}, 6000);
+}, 4000);
+
+// Sur mobile : bouton "passer" après 2s
+setTimeout(() => {
+  const splash = document.getElementById('splash');
+  if (!splash) return;
+  const skip = document.createElement('button');
+  skip.textContent = 'Appuyez pour continuer →';
+  skip.style.cssText = 'margin-top:24px;background:rgba(59,130,246,.2);border:1px solid rgba(59,130,246,.4);color:#93c5fd;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;';
+  skip.onclick = () => { clearTimeout(splashTimeout); hideSplash(); showAuthScreen(); };
+  splash.appendChild(skip);
+}, 2000);
 
 onAuthStateChanged(auth, async user => {
   clearTimeout(splashTimeout);
